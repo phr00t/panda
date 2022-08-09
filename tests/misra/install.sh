@@ -9,7 +9,7 @@ if [ ! -d cppcheck/ ]; then
 fi
 
 cd cppcheck
-git fetch
-git checkout e1cff1d1ef92f6a1c6962e0e4153b7353ccad04c
+git fetch --all
+git checkout 61f846073d9c348b408b21230790007bc8a022c2
 make clean
 make MATCHCOMPILTER=yes CXXFLAGS="-O2" -j8
