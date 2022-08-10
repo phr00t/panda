@@ -518,3 +518,17 @@ bool steer_torque_cmd_checks(int desired_torque, int steer_req, const SteeringLi
 
   return violation;
 }
+
+// Safety check for button message
+bool button_checks(int button, int resume_button, int cancel_button) {
+  bool violation = false;
+
+  // Allow button tx if cancel button and we're engaged, or resume and controls allowed
+  bool allowed_resume = (button == resume_button) && controls_allowed;
+  bool allowed_cancel = (button == cancel_button) && cruise_engaged_prev;
+  if (!(allowed_resume || allowed_cancel)) {
+    violation = true;
+  }
+
+  return violation;
+}
