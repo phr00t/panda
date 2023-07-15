@@ -469,45 +469,37 @@ class Panda:
     return fr[4:8] == b"\xde\xad\xd0\x0d"
 
   @staticmethod
-  def flash_static(handle, code, mcu_type):
-    assert mcu_type is not None, "must set valid mcu_type to flash"
-
+  def flash_static(handle, code):
     # confirm flasher is present
-    assert Panda.flasher_present(handle)
-
-    # determine sectors to erase
-    apps_sectors_cumsum = accumulate(mcu_type.config.sector_sizes[1:])
-    last_sector = next((i + 1 for i, v in enumerate(apps_sectors_cumsum) if v > len(code)), -1)
-    assert last_sector >= 1, "Binary too small? No sector to erase."
-    assert last_sector < 7, "Binary too large! Risk of overwriting provisioning chunk."
+    fr = handle.controlRead(Panda.REQUEST_IN, 0xb0, 0, 0, 0xc)
+    assert fr[4:8] == b"\xde\xad\xd0\x0d"
 
     # unlock flash
-    logging.warning("flash: unlocking")
+    print("flash: unlocking")
     handle.controlWrite(Panda.REQUEST_IN, 0xb1, 0, 0, b'')
 
-    # erase sectors
-    logging.warning(f"flash: erasing sectors 1 - {last_sector}")
-    for i in range(1, last_sector + 1):
+    # erase sectors 1 through 3
+    print("flash: erasing")
+    for i in range(1, 4):
       handle.controlWrite(Panda.REQUEST_IN, 0xb2, i, 0, b'')
 
     # flash over EP2
     STEP = 0x10
-    logging.warning("flash: flashing")
+    print("flash: flashing")
     for i in range(0, len(code), STEP):
       handle.bulkWrite(2, code[i:i + STEP])
 
     # reset
-    logging.warning("flash: resetting")
+    print("flash: resetting")
     try:
-      handle.controlWrite(Panda.REQUEST_IN, 0xd8, 0, 0, b'', expect_disconnect=True)
+      handle.controlWrite(Panda.REQUEST_IN, 0xd8, 0, 0, b'')
     except Exception:
       pass
 
-  def flash(self, fn=None, code=None, reconnect=True):
-    if not fn:
-      fn = os.path.join(FW_PATH, self._mcu_type.config.app_fn)
-    assert os.path.isfile(fn)
-    logging.debug("flash: main version is %s", self.get_version())
+  def flash(self, fn=DEFAULT_FW_FN, code=None, reconnect=True):
+    if self._mcu_type == MCU_TYPE_H7 and fn == DEFAULT_FW_FN:
+      fn = DEFAULT_H7_FW_FN
+    print("flash: main version is " + self.get_version())
     if not self.bootstub:
       self.reset(enter_bootstub=True)
     assert(self.bootstub)
@@ -517,10 +509,10 @@ class Panda:
         code = f.read()
 
     # get version
-    logging.debug("flash: bootstub version is %s", self.get_version())
+    print("flash: bootstub version is " + self.get_version())
 
     # do flash
-    Panda.flash_static(self._handle, code, mcu_type=self._mcu_type)
+    Panda.flash_static(self._handle, code)
 
     # reconnect
     if reconnect:
