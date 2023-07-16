@@ -117,9 +117,7 @@ pipeline {
             stage('prep') {
               steps {
                 script {
-                  retry (3) {
-                    docker_run("reset hardware", 3, "python ./tests/ci_reset_hw.py")
-                  }
+                  docker_run("reset hardware", 3, "python ./tests/ci_reset_hw.py")
                 }
               }
             }

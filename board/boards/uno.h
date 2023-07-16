@@ -126,7 +126,7 @@ void uno_set_can_mode(uint8_t mode){
   }
 }
 
-bool uno_board_tick(bool ignition, bool usb_enum, bool heartbeat_seen, bool harness_inserted) {
+void uno_board_tick(bool ignition, bool usb_enum, bool heartbeat_seen, bool harness_inserted) {
   UNUSED(ignition);
   UNUSED(usb_enum);
   UNUSED(heartbeat_seen);
@@ -136,7 +136,6 @@ bool uno_board_tick(bool ignition, bool usb_enum, bool heartbeat_seen, bool harn
   } else {
     uno_set_bootkick(false);
   }
-  return false;
 }
 
 bool uno_check_ignition(void){

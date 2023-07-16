@@ -335,7 +335,6 @@ class DriverTorqueSteeringSafetyTest(TorqueSteeringSafetyTestBase, abc.ABC):
 
   @classmethod
   def setUpClass(cls):
-    super().setUpClass()
     if cls.__name__ == "DriverTorqueSteeringSafetyTest":
       cls.safety = None
       raise unittest.SkipTest
@@ -895,7 +894,7 @@ class PandaSafetyTest(PandaSafetyTestBase):
               continue
             if attr.startswith('TestToyota') and current_test.startswith('TestToyota'):
               continue
-            if {attr, current_test}.issubset({'TestSubaruGen1Safety', 'TestSubaruGen2Safety'}):
+            if {attr, current_test}.issubset({'TestSubaruSafety', 'TestSubaruGen2Safety'}):
               continue
             if {attr, current_test}.issubset({'TestVolkswagenPqSafety', 'TestVolkswagenPqStockSafety', 'TestVolkswagenPqLongSafety'}):
               continue
