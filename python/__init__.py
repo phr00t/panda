@@ -199,11 +199,15 @@ class Panda:
   HW_TYPE_RED_PANDA_V2 = b'\x08'
   HW_TYPE_TRES = b'\x09'
 
-  CAN_PACKET_VERSION = 4
-  HEALTH_PACKET_VERSION = 14
+  #CAN_PACKET_VERSION = 4
+  #HEALTH_PACKET_VERSION = 14
   CAN_HEALTH_PACKET_VERSION = 5
-  HEALTH_STRUCT = struct.Struct("<IIIIIIIIIBBBBBBHBBBHfBBHBHH")
+  #HEALTH_STRUCT = struct.Struct("<IIIIIIIIIBBBBBBHBBBHfBBHBHH")
   CAN_HEALTH_STRUCT = struct.Struct("<BIBBBBBBBBIIIIIIIHHBBBIIII")
+
+  CAN_PACKET_VERSION = 2
+  HEALTH_PACKET_VERSION = 7
+  HEALTH_STRUCT = struct.Struct("<IIIIIIIIBBBBBBBHBBBHIf")
 
   F2_DEVICES = (HW_TYPE_PEDAL, )
   F4_DEVICES = (HW_TYPE_WHITE_PANDA, HW_TYPE_GREY_PANDA, HW_TYPE_BLACK_PANDA, HW_TYPE_UNO, HW_TYPE_DOS)
@@ -422,6 +426,10 @@ class Panda:
     return []
 
   def reset(self, enter_bootstub=False, enter_bootloader=False, reconnect=True):
+
+    # debug no-panda reset
+    return
+
     # no response is expected since it resets right away
     timeout = 5000 if isinstance(self._handle, PandaSpiHandle) else 15000
     try:
@@ -524,6 +532,10 @@ class Panda:
       pass
 
   def flash(self, fn=None, code=None, reconnect=True):
+
+    # debug no-flash panda
+    return
+
     if not fn:
       fn = os.path.join(FW_PATH, self._mcu_type.config.app_fn)
     assert os.path.isfile(fn)
@@ -607,30 +619,25 @@ class Panda:
       "uptime": a[0],
       "voltage": a[1],
       "current": a[2],
-      "safety_tx_blocked": a[3],
-      "safety_rx_invalid": a[4],
-      "tx_buffer_overflow": a[5],
-      "rx_buffer_overflow": a[6],
-      "gmlan_send_errs": a[7],
-      "faults": a[8],
-      "ignition_line": a[9],
-      "ignition_can": a[10],
-      "controls_allowed": a[11],
-      "gas_interceptor_detected": a[12],
-      "car_harness_status": a[13],
+      "can_rx_errs": a[3],
+      "can_send_errs": a[4],
+      "can_fwd_errs": a[5],
+      "gmlan_send_errs": a[6],
+      "faults": a[7],
+      "ignition_line": a[8],
+      "ignition_can": a[9],
+      "controls_allowed": a[10],
+      "gas_interceptor_detected": a[11],
+      "car_harness_status": a[12],
+      "usb_power_mode": a[13],
       "safety_mode": a[14],
       "safety_param": a[15],
       "fault_status": a[16],
       "power_save_enabled": a[17],
       "heartbeat_lost": a[18],
       "alternative_experience": a[19],
-      "interrupt_load": a[20],
-      "fan_power": a[21],
-      "safety_rx_checks_invalid": a[22],
-      "spi_checksum_error_count": a[23],
-      "fan_stall_count": a[24],
-      "sbu1_voltage_mV": a[25],
-      "sbu2_voltage_mV": a[26],
+      "blocked_msg_cnt": a[20],
+      "interrupt_load": a[21],
     }
 
   @ensure_can_health_packet_version
