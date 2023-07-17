@@ -484,40 +484,21 @@ class Panda:
 
     # unlock flash
     logging.warning("flash: unlocking")
-
-    # debug
-    print("flash: unlocking in 5 seconds...")
-    time.sleep(5)
-
     handle.controlWrite(Panda.REQUEST_IN, 0xb1, 0, 0, b'')
 
     # erase sectors
     logging.warning(f"flash: erasing sectors 1 - {last_sector}")
-
     for i in range(1, last_sector + 1):
-      # debug
-      print(f"flash: erasing sector {i} in 5 seconds...")
-      time.sleep(5)
       handle.controlWrite(Panda.REQUEST_IN, 0xb2, i, 0, b'')
 
     # flash over EP2
     STEP = 0x10
     logging.warning("flash: flashing")
-
-    # debug
-    print("flash: flashing in 5 seconds...")
-    time.sleep(5)
-
     for i in range(0, len(code), STEP):
       handle.bulkWrite(2, code[i:i + STEP])
 
     # reset
     logging.warning("flash: resetting")
-
-    # debug
-    print("flash: resetting in 5 seconds...")
-    time.sleep(5)
-
     try:
       handle.controlWrite(Panda.REQUEST_IN, 0xd8, 0, 0, b'', expect_disconnect=True)
     except Exception:
